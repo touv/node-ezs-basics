@@ -10,7 +10,7 @@ function TXTZip(data, feed) {
         deflator = new pako.Deflate({ level: 9 });
         deflator.onData = chunk => feed.write(chunk);
     }
-    deflator.push(data, false);
+    deflator.push(Buffer.from(data, 'binary'), false);
     feed.end();
 }
 
