@@ -4,11 +4,12 @@ let deflator;
 function TXTZip(data, feed) {
     if (this.isLast()) {
         deflator.push('', true);
-        return feed.close();
+        return;
     }
     if (this.isFirst()) {
         deflator = new pako.Deflate({ level: 9 });
         deflator.onData = chunk => feed.write(chunk);
+        deflator.onEnd = () => feed.close();
     }
     deflator.push(Buffer.from(data, 'binary'), false);
     feed.end();
