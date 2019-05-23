@@ -8,7 +8,8 @@ ezs.use(require('../lib'));
 describe('txt-zip', () => {
     it('should zip a stream containing a string', (done) => {
         let length = 0;
-        const input = 'Ahahahaha this is a longer string, to see if it\'s more efficient!';
+        const input = 'Ahahahaha this is a longer string, to see if it\'s more efficient! '
+                    + 'When there is a gzip wrapper, the text should be longer';
         from([input])
             .pipe(ezs('TXTZip'))
             .on('data', (chunk) => {
@@ -38,7 +39,7 @@ describe('txt-zip', () => {
     });
 
     it('should be unzippable', (done) => {
-        const inflate = new pako.Inflate();
+        const inflate = new pako.Inflate({ to: 'string' });
 
         const input1 = 'Ahahahaha this is a longer string, to see if it\'s more efficient!';
         const input2 = 'And this is the second string, that should be long to see a compression rate.';
@@ -51,7 +52,7 @@ describe('txt-zip', () => {
                 inflate.push(null, true);
                 const output = inflate.result;
                 assert.strictEqual(output.length, input1.length + input2.length);
-                assert.strictEqual(String.fromCharCode(...output), input1 + input2);
+                assert.strictEqual(output, input1 + input2);
                 done();
             })
             .on('error', done);

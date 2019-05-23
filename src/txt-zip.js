@@ -7,7 +7,7 @@ function TXTZip(data, feed) {
         return;
     }
     if (this.isFirst()) {
-        deflator = new pako.Deflate({ level: 9 });
+        deflator = new pako.Deflate({ level: 9, to: 'string', gzip: true, header: { text: true } });
         deflator.onData = chunk => feed.write(chunk);
         deflator.onEnd = () => feed.close();
     }
