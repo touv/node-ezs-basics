@@ -76,4 +76,25 @@ describe('txt-zip', () => {
             })
             .on('error', done);
     });
+
+    it('should yield compressed string', (done) => {
+        const inflate = new pako.Inflate({ to: 'string' });
+
+        const input1 = 'Ahahahaha je fais une chaîne assez longue pour constater une compression.';
+        const input2 = 'Et ça c\'est la seconde chaîne, avec des accents insérés, pour vérifier l\'encodage.';
+        from([input1, input2])
+            .pipe(ezs('TXTZip'))
+            .on('data', (chunk) => {
+                inflate.push(chunk);
+            })
+            .on('end', () => {
+                inflate.push(null, true);
+                const output = inflate.result;
+                assert.strictEqual(typeof output, 'string');
+                assert.strictEqual(output.length, input1.length + input2.length);
+                assert.strictEqual(output, input1 + input2);
+                done();
+            })
+            .on('error', done);
+    });
 });
