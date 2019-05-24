@@ -1,18 +1,15 @@
-import pako from 'pako';
+import zlib from 'zlib';
 
-let deflator;
 function TXTZip(data, feed) {
     if (this.isLast()) {
-        deflator.push('', true);
-        return;
+        return feed.close();
     }
-    if (this.isFirst()) {
-        deflator = new pako.Deflate({ level: 9, to: 'string', gzip: true, header: { text: true } });
-        deflator.onData = chunk => feed.write(chunk);
-        deflator.onEnd = () => feed.close();
-    }
-    deflator.push(Buffer.from(data, 'binary'), false);
-    feed.end();
+
+    zlib.deflate(data, (err, buffer) => {
+        if (err) { return feed.stop(err); }
+        feed.write(buffer);
+        return feed.end();
+    });
 }
 
 /**
