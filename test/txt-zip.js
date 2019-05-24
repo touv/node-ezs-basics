@@ -24,14 +24,17 @@ describe('txt-zip', () => {
 
     it('should zip a stream containing two strings', (done) => {
         let length = 0;
+        let chunksNb = 0;
         const input1 = 'Ahahahaha this is a longer string, to see if it\'s more efficient!';
         const input2 = 'And this is the second string, that should be long to see a compression rate.';
         from([input1, input2])
             .pipe(ezs('TXTZip'))
             .on('data', (chunk) => {
                 length += chunk.length;
+                chunksNb += 1;
             })
             .on('end', () => {
+                assert.strictEqual(chunksNb, 2);
                 assert.ok(input1.length + input2.length >= length);
                 done();
             })
