@@ -1,17 +1,25 @@
-import pako from 'pako';
+import zlib from 'zlib';
+import { PassThrough } from 'stream';
 
 function TXTZip(data, feed) {
-    if (this.isLast()) {
-        this.deflator.push('', true);
-        return;
-    }
     if (this.isFirst()) {
-        this.deflator = new pako.Deflate({ level: 9, to: 'string', gzip: true, header: { text: true } });
-        this.deflator.onData = chunk => feed.write(chunk);
-        this.deflator.onEnd = () => feed.close();
+        this.input = new PassThrough();
+        this.gzip = zlib.createGzip();
+        const output = this.input.pipe(this.gzip);
+        output.on('data', d => feed.write(d));
+        output.on('end', () => feed.close());
+        output.on('error', e => feed.stop(e));
     }
-    this.deflator.push(Buffer.from(data, 'binary'), false);
-    feed.end();
+
+    if (this.isLast()) {
+        return this.input.end();
+    }
+
+    if (!this.input.write(data)) {
+        this.input.once('drain', () => feed.end());
+    } else {
+        feed.end();
+    }
 }
 
 /**
