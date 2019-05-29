@@ -1,15 +1,23 @@
 import zlib from 'zlib';
+import { PassThrough } from 'stream';
 
 function TXTZip(data, feed) {
-    if (this.isLast()) {
-        return feed.close();
+    if (this.isFirst()) {
+        this.output = new PassThrough();
+        this.input = new PassThrough();
+        this.gzip = zlib.createGzip();
+        this.input.pipe(this.gzip).pipe(this.output);
+        this.output.on('data', d => feed.send(d));
+        this.output.on('finish', () => feed.close());
     }
 
-    zlib.deflate(data, (err, buffer) => {
-        if (err) { return feed.stop(err); }
-        feed.write(buffer);
-        return feed.end();
-    });
+    if (this.isLast()) {
+        return this.input.end();
+    }
+
+    if (!this.input.write(data)) {
+        this.input.once('drain');
+    }
 }
 
 /**

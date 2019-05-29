@@ -30,6 +30,7 @@ describe('txt-zip', () => {
         from([input1, input2])
             .pipe(ezs('TXTZip'))
             .on('data', (chunk) => {
+                console.log({chunk});
                 length += chunk.length;
                 chunksNb += 1;
             })
