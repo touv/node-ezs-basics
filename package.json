@@ -24,7 +24,6 @@
     "fetch-with-proxy": "1.1.0",
     "flat": "2.0.1",
     "isomorphic-fetch": "2.2.1",
-    "pako": "1.0.10",
     "tmp-filepath": "2.0.0",
     "xml-mapping": "1.7.1",
     "xml-splitter": "1.2.1"
@@ -53,7 +52,8 @@
     "ezs": "9.3.0",
     "from": "^0.1.7",
     "istanbul": "^0.4.5",
-    "mocha": "5.2.0"
+    "mocha": "5.2.0",
+    "pako": "1.0.10"
   },
   "peerDependencies": {
     "ezs": "*"
