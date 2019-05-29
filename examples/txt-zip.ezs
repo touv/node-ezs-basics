@@ -1,6 +1,4 @@
 [use]
 plugin = .
 
-; [JSONString]
 [TXTZip]
-; [dump]
