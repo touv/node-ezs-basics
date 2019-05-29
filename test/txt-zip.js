@@ -30,7 +30,6 @@ describe('txt-zip', () => {
         from([input1, input2])
             .pipe(ezs('TXTZip'))
             .on('data', (chunk) => {
-                console.log({chunk});
                 length += chunk.length;
                 chunksNb += 1;
             })
@@ -63,7 +62,7 @@ describe('txt-zip', () => {
     });
 
     it('should preserve Unicode', (done) => {
-        const inflate = new pako.Inflate();
+        const inflate = new pako.Inflate({ to: 'string' });
 
         const input1 = 'Ahahahaha je fais une chaîne assez longue pour constater une compression.';
         const input2 = 'Et ça c\'est la seconde chaîne, avec des accents insérés, pour vérifier l\'encodage.';
@@ -75,7 +74,7 @@ describe('txt-zip', () => {
             .on('end', () => {
                 inflate.push(null, true);
                 const output = inflate.result;
-                assert.strictEqual(String.fromCharCode(...output), input1 + input2);
+                assert.strictEqual(output, input1 + input2);
                 done();
             })
             .on('error', done);
