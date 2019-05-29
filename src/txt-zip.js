@@ -1,17 +1,16 @@
 import pako from 'pako';
 
-let deflator;
 function TXTZip(data, feed) {
     if (this.isLast()) {
-        deflator.push('', true);
+        this.deflator.push('', true);
         return;
     }
     if (this.isFirst()) {
-        deflator = new pako.Deflate({ level: 9, to: 'string', gzip: true, header: { text: true } });
-        deflator.onData = chunk => feed.write(chunk);
-        deflator.onEnd = () => feed.close();
+        this.deflator = new pako.Deflate({ level: 9, to: 'string', gzip: true, header: { text: true } });
+        this.deflator.onData = chunk => feed.write(chunk);
+        this.deflator.onEnd = () => feed.close();
     }
-    deflator.push(Buffer.from(data, 'binary'), false);
+    this.deflator.push(Buffer.from(data, 'binary'), false);
     feed.end();
 }
 
